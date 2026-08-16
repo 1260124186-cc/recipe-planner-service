@@ -84,3 +84,38 @@ func TestRestockRejectsInvalidBatchWithoutChangingPantry(t *testing.T) {
 		t.Fatalf("invalid restock changed pantry: %#v", snapshot)
 	}
 }
+
+func TestStoredRecipeDoesNotChangeWhenCallerReusesSlices(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	memory := store.NewMemoryStore()
+	catalog := service.NewCatalogService(memory, memory)
+
+	recipe := domain.Recipe{
+		ID:    "shared-slices",
+		Name:  "Shared Slices",
+		Tags:  []string{"quick"},
+		Steps: []string{"Chop vegetables"},
+		Ingredients: []domain.IngredientNeed{
+			{Name: "tomato", Portions: 2},
+		},
+	}
+	if err := catalog.CreateRecipe(ctx, recipe); err != nil {
+		t.Fatalf("create recipe: %v", err)
+	}
+	recipe.Tags[0] = "slow"
+	recipe.Steps[0] = "Discard ingredients"
+	recipe.Ingredients[0].Portions = 99
+
+	recipes, err := catalog.ListRecipes(ctx)
+	if err != nil {
+		t.Fatalf("list recipes: %v", err)
+	}
+	if len(recipes) != 1 {
+		t.Fatalf("recipe count = %d, want 1", len(recipes))
+	}
+	got := recipes[0]
+	if got.Tags[0] != "quick" || got.Steps[0] != "Chop vegetables" || got.Ingredients[0].Portions != 2 {
+		t.Fatalf("stored recipe changed with caller slices: %#v", got)
+	}
+}

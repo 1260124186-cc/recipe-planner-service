@@ -65,9 +65,6 @@ func (r Recipe) MatchesTag(tag string) bool {
 func (r Recipe) Normalized() Recipe {
 	normalized := r
 	normalized.Name = strings.TrimSpace(r.Name)
-	normalized.Tags = append([]string(nil), r.Tags...)
-	normalized.Steps = append([]string(nil), r.Steps...)
-	normalized.Ingredients = append([]IngredientNeed(nil), r.Ingredients...)
 	for i := range normalized.Tags {
 		normalized.Tags[i] = strings.ToLower(strings.TrimSpace(normalized.Tags[i]))
 	}
