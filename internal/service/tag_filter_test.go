@@ -38,8 +38,8 @@ func TestGeneratePlanOnlyUsesRecipesMatchingRequestedTag(t *testing.T) {
 
 func TestRecipeTagMatchingIgnoresCallerCase(t *testing.T) {
 	t.Parallel()
-	recipe := domain.Recipe{Tags: []string{"quick"}}
+	recipe := domain.Recipe{Tags: []string{"Quick"}}
 	if !recipe.MatchesTag("QUICK") {
-		t.Fatal("tag matching should not depend on caller capitalization")
+		t.Fatal("tag matching should not depend on capitalization")
 	}
 }
