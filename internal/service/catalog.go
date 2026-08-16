@@ -28,5 +28,9 @@ func (s *CatalogService) ListRecipes(ctx context.Context) ([]domain.Recipe, erro
 }
 
 func (s *CatalogService) RestockPantry(ctx context.Context, items []domain.PantryItem) error {
-	return s.pantry.Restock(ctx, items)
+	normalized, err := domain.NormalizePantryItems(items)
+	if err != nil {
+		return err
+	}
+	return s.pantry.Restock(ctx, normalized)
 }

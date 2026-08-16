@@ -71,10 +71,13 @@ func (s *MemoryStore) Restock(ctx context.Context, items []domain.PantryItem) er
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	// 先校验全部条目，全部通过后再一次性写入，保证失败请求不会部分改变库存。
 	for _, item := range items {
 		if item.Name == "" || item.Portions <= 0 {
 			return fmt.Errorf("invalid pantry item %q", item.Name)
 		}
+	}
+	for _, item := range items {
 		s.pantry[item.Name] += item.Portions
 	}
 	return nil
