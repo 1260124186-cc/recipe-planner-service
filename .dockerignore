@@ -1,0 +1,10 @@
+.git
+.DS_Store
+tasks/
+registry/
+*.patch
+*.log
+coverage.out
+tmp/
+bin/
+BUG_REPRO.md
