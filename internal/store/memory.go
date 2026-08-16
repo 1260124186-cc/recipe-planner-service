@@ -108,11 +108,11 @@ func (s *MemoryStore) GetPlan(ctx context.Context, id string) (domain.MealPlan, 
 		return domain.MealPlan{}, err
 	}
 	s.mu.RLock()
+	defer s.mu.RUnlock()
 	plan, exists := s.plans[id]
 	if !exists {
 		return domain.MealPlan{}, fmt.Errorf("plan %q was not found", id)
 	}
-	s.mu.RUnlock()
 	return clonePlan(plan), nil
 }
 
@@ -122,11 +122,11 @@ func (s *MemoryStore) CompleteMeal(ctx context.Context, planID, date string, nee
 		return err
 	}
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	plan, exists := s.plans[planID]
 	if !exists {
 		return fmt.Errorf("plan %q was not found", planID)
 	}
-	defer s.mu.Unlock()
 	entryIndex := -1
 	for i := range plan.Entries {
 		if plan.Entries[i].Date == date {
