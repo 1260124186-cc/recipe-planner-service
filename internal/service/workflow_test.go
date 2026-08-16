@@ -84,3 +84,25 @@ func TestRestockRejectsInvalidBatchWithoutChangingPantry(t *testing.T) {
 		t.Fatalf("invalid restock changed pantry: %#v", snapshot)
 	}
 }
+
+func TestRestockNormalizesAndMergesMatchingPantryItems(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	memory := store.NewMemoryStore()
+	catalog := service.NewCatalogService(memory, memory)
+
+	if err := catalog.RestockPantry(ctx, []domain.PantryItem{
+		{Name: " Tomato ", Portions: 2},
+		{Name: "TOMATO", Portions: 3},
+	}); err != nil {
+		t.Fatalf("restock pantry: %v", err)
+	}
+	snapshot, err := memory.PantrySnapshot(ctx)
+	if err != nil {
+		t.Fatalf("pantry snapshot: %v", err)
+	}
+	want := map[string]int{"tomato": 5}
+	if !reflect.DeepEqual(snapshot, want) {
+		t.Fatalf("pantry snapshot = %#v, want %#v", snapshot, want)
+	}
+}
