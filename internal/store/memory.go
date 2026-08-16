@@ -72,6 +72,9 @@ func (s *MemoryStore) Restock(ctx context.Context, items []domain.PantryItem) er
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for _, item := range items {
+		if item.Name == "" || item.Portions <= 0 {
+			return fmt.Errorf("invalid pantry item %q", item.Name)
+		}
 		s.pantry[item.Name] += item.Portions
 	}
 	return nil
