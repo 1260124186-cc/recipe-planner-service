@@ -23,7 +23,7 @@ curl --fail http://127.0.0.1:8080/recipes
 
 ## 版本固定方式
 
-`go.mod` 固定 Go 语言版本为 `1.26.2`。实际 Dockerfile 为 `benzhi.Dockerfile`，其基础镜像固定为 `golang:1.26.2-bookworm`，并设置 `GOTOOLCHAIN=local`，因此容器不会自行下载或切换 Go 工具链。Dockerfile 先执行 `go mod download`，复制源码后执行 `go build ./...`，不会复制宿主机编译产物。
+`go.mod` 固定 Go 语言版本为 `1.26.2`。实际 Dockerfile 为 `benzhi.Dockerfile`，其基础镜像固定为 `golang:1.26.2-bookworm`，并设置 `GOTOOLCHAIN=local`，因此容器不会自行下载或切换 Go 工具链。Dockerfile 先执行 `go mod download`，复制源码后执行 `go build ./...`，再从同一源码生成服务启动二进制；不会复制宿主机编译产物。
 
 ## 双架构标准验收
 

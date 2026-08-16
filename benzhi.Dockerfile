@@ -7,7 +7,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN --mount=type=cache,target=/root/.cache/go-build go build ./...
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    go build ./... && go build -o /usr/local/bin/recipe-planner ./cmd/server
 
 EXPOSE 8080
-CMD ["go", "run", "./cmd/server"]
+CMD ["/usr/local/bin/recipe-planner"]
