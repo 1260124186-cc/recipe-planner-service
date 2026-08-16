@@ -55,7 +55,7 @@ func (r Recipe) MatchesTag(tag string) bool {
 		return true
 	}
 	for _, candidate := range r.Tags {
-		if strings.EqualFold(strings.TrimSpace(candidate), tag) {
+		if strings.TrimSpace(candidate) == tag {
 			return true
 		}
 	}

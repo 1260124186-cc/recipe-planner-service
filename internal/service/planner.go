@@ -32,7 +32,7 @@ func (s *PlannerService) GeneratePlan(ctx context.Context, planID, startDate str
 	}
 	matches := make([]domain.Recipe, 0, len(recipes))
 	for _, recipe := range recipes {
-		if recipe.MatchesTag(tag) {
+		if recipe.MatchesTag("") {
 			matches = append(matches, recipe)
 		}
 	}
