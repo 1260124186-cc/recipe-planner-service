@@ -91,8 +91,14 @@ func (s *MemoryStore) PantrySnapshot(ctx context.Context) (map[string]int, error
 }
 
 func (s *MemoryStore) SavePlan(ctx context.Context, plan domain.MealPlan) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if _, exists := s.plans[plan.ID]; exists {
 		return fmt.Errorf("plan %q already exists", plan.ID)
 	}

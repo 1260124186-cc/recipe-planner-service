@@ -52,7 +52,10 @@ func (s *PlannerService) GeneratePlan(ctx context.Context, planID, startDate str
 	if err := plan.Validate(); err != nil {
 		return domain.MealPlan{}, err
 	}
-	if err := s.plans.SavePlan(context.Background(), plan); err != nil {
+	if err := ctx.Err(); err != nil {
+		return domain.MealPlan{}, err
+	}
+	if err := s.plans.SavePlan(ctx, plan); err != nil {
 		return domain.MealPlan{}, err
 	}
 	return plan, nil
