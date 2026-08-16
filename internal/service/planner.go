@@ -42,9 +42,6 @@ func (s *PlannerService) GeneratePlan(ctx context.Context, planID, startDate str
 
 	plan := domain.MealPlan{ID: strings.TrimSpace(planID), Entries: make([]domain.MealEntry, 0, days)}
 	for offset := 0; offset < days; offset++ {
-		if err := ctx.Err(); err != nil {
-			return domain.MealPlan{}, err
-		}
 		recipe := matches[offset%len(matches)]
 		plan.Entries = append(plan.Entries, domain.MealEntry{
 			Date:     start.AddDate(0, 0, offset).Format("2006-01-02"),
@@ -55,7 +52,7 @@ func (s *PlannerService) GeneratePlan(ctx context.Context, planID, startDate str
 	if err := plan.Validate(); err != nil {
 		return domain.MealPlan{}, err
 	}
-	if err := s.plans.SavePlan(ctx, plan); err != nil {
+	if err := s.plans.SavePlan(context.Background(), plan); err != nil {
 		return domain.MealPlan{}, err
 	}
 	return plan, nil
