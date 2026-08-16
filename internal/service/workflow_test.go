@@ -90,6 +90,8 @@ func TestStoredRecipeDoesNotChangeWhenCallerReusesSlices(t *testing.T) {
 	ctx := context.Background()
 	memory := store.NewMemoryStore()
 	catalog := service.NewCatalogService(memory, memory)
+	planner := service.NewPlannerService(memory, memory)
+	shopping := service.NewShoppingService(memory, memory, memory)
 
 	recipe := domain.Recipe{
 		ID:    "shared-slices",
@@ -117,5 +119,22 @@ func TestStoredRecipeDoesNotChangeWhenCallerReusesSlices(t *testing.T) {
 	got := recipes[0]
 	if got.Tags[0] != "quick" || got.Steps[0] != "Chop vegetables" || got.Ingredients[0].Portions != 2 {
 		t.Fatalf("stored recipe changed with caller slices: %#v", got)
+	}
+
+	plan, err := planner.GeneratePlan(ctx, "shared-slices-plan", "2026-08-17", 1, "quick")
+	if err != nil {
+		t.Fatalf("generate plan from stored recipe: %v", err)
+	}
+	if len(plan.Entries) != 1 || plan.Entries[0].RecipeID != recipe.ID {
+		t.Fatalf("generated plan = %#v, want stored recipe", plan)
+	}
+
+	items, err := shopping.BuildList(ctx, plan.ID)
+	if err != nil {
+		t.Fatalf("build shopping list: %v", err)
+	}
+	wantItems := []service.ShoppingItem{{Name: "tomato", Portions: 2}}
+	if !reflect.DeepEqual(items, wantItems) {
+		t.Fatalf("shopping list = %#v, want %#v", items, wantItems)
 	}
 }

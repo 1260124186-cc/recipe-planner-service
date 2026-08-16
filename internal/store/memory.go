@@ -154,6 +154,9 @@ func (s *MemoryStore) CompleteMeal(ctx context.Context, planID, date string, nee
 }
 
 func cloneRecipe(recipe domain.Recipe) domain.Recipe {
+	recipe.Tags = append([]string(nil), recipe.Tags...)
+	recipe.Steps = append([]string(nil), recipe.Steps...)
+	recipe.Ingredients = append([]domain.IngredientNeed(nil), recipe.Ingredients...)
 	return recipe
 }
 
