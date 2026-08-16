@@ -7,7 +7,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN go build ./...
+RUN --mount=type=cache,target=/root/.cache/go-build go build ./...
 
 EXPOSE 8080
 CMD ["go", "run", "./cmd/server"]
